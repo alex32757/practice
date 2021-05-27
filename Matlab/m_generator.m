@@ -1,4 +1,4 @@
-%генерация м-последовательностей
+%m-sequence generation
 function m_seq = m_generator(polynom, registers, n, k)
     for i = n:(power(2, n) - 2)
         registers(end + 1) = 0;
