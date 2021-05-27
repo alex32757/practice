@@ -4,7 +4,7 @@ registers = [1, 1, 1, 1];
 frequencyOfSignal = 5000;
 frequencyOfD = 44100;
 tau = 10;
-SNR = 6;
+SNR = 7;
 amplitude = 1;
 powerOfPoly = 4;
 N = power(2, powerOfPoly) - 1;
@@ -42,7 +42,6 @@ audiowrite('output.wav', resultSignal, frequencyOfD);
 Nfft = 4096;
 G0 = [value, zeros(1, Nfft - length(value))];
 F0 = fft(G0);
-
 resultSignalForDetect = [resultSignal, zeros(1, Nfft - mod(length(resultSignal), Nfft))];
 iter = length(resultSignalForDetect)/Nfft;
 G = [];
