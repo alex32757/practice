@@ -1,9 +1,10 @@
 %create our alphabet
 keySet = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15];
 valueSet = {'T', 'E', 'S', '_', 'M', 'A', 'G', '-', '-', '-', '-', '-', '-', '-', '-'};
-M = containers.Map(keySet,valueSet);
+M = containers.Map(keySet,valueSet); 
 %initial data
 polynom = [1, 1, 0, 0, 1]; %1+x^1+x^4
+alternative_polynom = [1, 0, 0, 1, 1]; %1+x^3+x^4
 registers = [1, 1, 1, 1];
 frequencyOfSignal = 5000;
 frequencyOfD = 44100;
@@ -12,14 +13,19 @@ SNR = 6;
 amplitude = 1;
 powerOfPoly = 4;
 N = power(2, powerOfPoly) - 1;
-Nfft = 4096;
-output_sensitivity = 0.80;
+Nfft = 2048;
+output_sensitivity = 0.70;
 
 %creating all shifts
 mSeq = [];
 for i=0:14
    mSeq = [mSeq; m_generator(polynom, registers, powerOfPoly, i)]; 
    mSeq(i+1,:);
+end
+add_mSeq = m_generator(alternative_polynom, registers, powerOfPoly, 7);
+%multiply by another sequence
+for i = 1 : 15
+    mSeq(i,:) = mSeq(i,:) .* add_mSeq;
 end
 
 %noise generation
@@ -35,29 +41,17 @@ valueBetweenSignal = zeros(1, noiseCount);
 values = signal_generator(mSeq, N, tau, frequencyOfSignal, frequencyOfD, amplitude);
 value = [];
 value = [value, values(1,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(2,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(3,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(1,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(4,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(5,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(2,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(3,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(3,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(6,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(7,:)];
-value = [value, valueBetweenSignal];
 value = [value, values(2,:)];
-value = [value, valueBetweenSignal];
 
 %noise overlay
 valueDuringSignal = awgn(value, SNR);
@@ -67,7 +61,7 @@ maxValueOfSignal = max(abs(resultSignal));
 resultSignal = resultSignal / maxValueOfSignal;
 
 %output
-t = 0 : 1/frequencyOfD : 4 + 1 / frequencyOfSignal * tau * N * 12 * 2;
+t = 0 : 1/frequencyOfD : 4 + 1 / frequencyOfSignal * tau * N * 12 * 1;
 t = t(1 : length(resultSignal));
 figure
 plot(t, resultSignal)
@@ -112,11 +106,10 @@ end
 %output
 res = [];
 for i = 1:length(GMaxGlobal)
-    if GMaxGlobal(i) > max(GMaxGlobal) * output_sensitivity
+    if GMaxGlobal(i) > max(GMaxGlobal) * output_sensitivity 
         res = [res, M(IndGlobal(i))];
     end
 end
-
 res
 
 
